@@ -22,7 +22,6 @@
 
             Button:
                 text: 'Done'
-                on_press: game_screen.player1_archer.attack(10)
 
             ToggleButton:
                 id: move_button
@@ -50,13 +49,13 @@
                     BoxLayout:
                         orientation: 'vertical'
                         Label:
-                            text: str(game_screen.player1_archer.get_type_of_unit())
+                            text: str(game_board.player1_archer.get_type_of_unit())
                             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                         Label:
-                            text: 'Health ' + str(game_screen.player1_archer.health) + '/' + str(game_screen.player1_archer.initial_health)
+                            text: 'Health ' + str(game_board.player1_archer.health) + '/' + str(game_board.player1_archer.initial_health)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.8}
                         Label:
-                            text: 'Damage ' + str(game_screen.player1_archer.damage)
+                            text: 'Damage ' + str(game_board.player1_archer.damage)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                         BoxLayout:
                             Button:
@@ -77,13 +76,13 @@
                     BoxLayout:
                         orientation: 'vertical'
                         Label:
-                            text: str(game_screen.player1_knight.get_type_of_unit())
+                            text: str(game_board.player1_knight.get_type_of_unit())
                             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                         Label:
-                            text: 'Health ' + str(game_screen.player1_knight.health) + '/' + str(game_screen.player1_knight.initial_health)
+                            text: 'Health ' + str(game_board.player1_knight.health) + '/' + str(game_board.player1_knight.initial_health)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.8}
                         Label:
-                            text: 'Damage ' + str(game_screen.player1_knight.damage)
+                            text: 'Damage ' + str(game_board.player1_knight.damage)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                         BoxLayout:
                             Button:
@@ -105,13 +104,13 @@
                     BoxLayout:
                         orientation: 'vertical'
                         Label:
-                            text: str(game_screen.player1_wizard.get_type_of_unit())
+                            text: str(game_board.player1_wizard.get_type_of_unit())
                             pos_hint: {'center_x': 0.5, 'center_y': 0.1}
                         Label:
-                            text: 'Health ' + str(game_screen.player1_wizard.health) + '/' + str(game_screen.player1_wizard.initial_health)
+                            text: 'Health ' + str(game_board.player1_wizard.health) + '/' + str(game_board.player1_wizard.initial_health)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.8}
                         Label:
-                            text: 'Damage ' + str(game_screen.player1_wizard.damage)
+                            text: 'Damage ' + str(game_board.player1_wizard.damage)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                         BoxLayout:
                             Button:

@@ -43,6 +43,7 @@ class Unit(Widget):
         self.damage = 0
         self.short_name = short_name
         self.attack_range = 0
+        self.player = 0
 
     def attack(self, damage):
         self.health = self.health - damage
@@ -57,30 +58,33 @@ class Stone(Unit):
 
 
 class Archer(Unit):
-    def __init__(self, **kwargs):
+    def __init__(self, player, **kwargs):
         Unit.__init__(self, "Archer", "A", **kwargs)
         self.health = 100
         self.initial_health = 100
         self.damage = 10
         self.attack_range = 6
+        self.player = player
 
 
 class Knight(Unit):
-    def __init__(self, **kwargs):
+    def __init__(self, player, **kwargs):
         Unit.__init__(self, "Knight", "K", **kwargs)
         self.health = 150
         self.initial_health = 150
         self.damage = 50
         self.attack_range = 1
+        self.player = player
 
 
 class Wizard(Unit):
-    def __init__(self, **kwargs):
+    def __init__(self, player, **kwargs):
         Unit.__init__(self, "Wizard", "W", **kwargs)
         self.health = 100
         self.initial_health = 100
         self.damage = 20
         self.attack_range = 4
+        self.player = player
 
 
 class StartScreen(Screen):
@@ -92,17 +96,11 @@ class GridEntry(Button):
     coords = ListProperty([0, 0])
     possible_to_attack_this_grid = False
     possible_to_move_to_this_grid = False
-    player = 0
     unit = Unit()
 
 
 class GameScreen(Screen):
-    player1_archer = Archer()
-    player1_knight = Knight()
-    player1_wizard = Wizard()
-    player2_archer = Archer()
-    player2_knight = Knight()
-    player2_wizard = Wizard()
+    pass
 
 
 class ArcherGameBoard(BoxLayout):
@@ -118,6 +116,12 @@ class WizardGameBoard(BoxLayout):
 
 
 class GameBoardGrid(GridLayout):
+    player1_archer = Archer(1)
+    player1_knight = Knight(1)
+    player1_wizard = Wizard(1)
+    player2_archer = Archer(2)
+    player2_knight = Knight(2)
+    player2_wizard = Wizard(2)
     number_of_cols = 9
     number_of_rows = 9
     active_coords = ListProperty([-1, -1])
@@ -138,23 +142,17 @@ class GameBoardGrid(GridLayout):
 
         for child in self.children:
             if child.coords == [0, 2]:
-                child.unit = Archer()
-                child.player = 1
+                child.unit = self.player1_archer
             if child.coords == [0, 4]:
-                child.unit = Knight()
-                child.player = 1
+                child.unit = self.player1_knight
             if child.coords == [0, 6]:
-                child.unit = Wizard()
-                child.player = 1
+                child.unit = self.player1_wizard
             if child.coords == [8, 2]:
-                child.unit = Wizard()
-                child.player = 2
+                child.unit = self.player2_wizard
             if child.coords == [8, 4]:
-                child.unit = Knight()
-                child.player = 2
+                child.unit = self.player2_knight
             if child.coords == [8, 6]:
-                child.unit = Archer()
-                child.player = 2
+                child.unit = self.player2_archer
             if child.coords == [2, 3]:
                 child.unit = Stone()
             if child.coords == [2, 5]:
@@ -173,7 +171,7 @@ class GameBoardGrid(GridLayout):
                 child.background_color = colors['attack']
             elif child.possible_to_move_to_this_grid:
                 child.background_color = colors['move']
-            elif child.unit.short_name != '' and child.player == self.player_turn:
+            elif child.unit.short_name != '' and child.unit.player == self.player_turn:
                 child.background_color = colors['units_turn']
             else:
                 child.background_color = colors['default_background']
@@ -193,28 +191,24 @@ class GameBoardGrid(GridLayout):
         elif self.action_property == 'move' and (isinstance(button.unit, Archer) or
                                                  isinstance(button.unit, Knight) or
                                                  isinstance(button.unit, Wizard)):
-            if button.player == self.player_turn:
+            if button.unit.player == self.player_turn:
                 self.active_coords = button.coords
                 self.active_unit = button.unit
                 self.show_possible_moves(row, col)
         elif self.action_property == 'attack' and (isinstance(button.unit, Archer) or
                                                    isinstance(button.unit, Knight) or
                                                    isinstance(button.unit, Wizard)):
-            if button.player == self.player_turn:
+            if button.unit.player == self.player_turn:
                 self.active_coords = button.coords
                 self.active_unit = button.unit
                 self.show_possible_targets(row, col, button.unit)
         elif self.action_property == 'move' and button.possible_to_move_to_this_grid:
             active_unit = ''
-            active_player = 0
             for child in self.children:
                 if child.coords == self.active_coords:
                     active_unit = child.unit
-                    active_player = child.player
                     child.unit = Unit()
-                    child.player = 0
             button.unit = active_unit
-            button.player = active_player
             self.clear_board()
             self.active_coords = [-1, -1]
             self.player_turn = 1 if (self.player_turn == 2) else 2
@@ -317,7 +311,7 @@ class GameBoardGrid(GridLayout):
         for child in self.children:
             test_row, test_col = child.coords
             if 0 < target_table[test_row][test_col] <= attack_unit.attack_range:
-                if child.player != self.player_turn and child.unit.short_name != '':
+                if child.unit.player != self.player_turn and child.unit.short_name != '':
                     child.possible_to_attack_this_grid = True
 
         self.draw_board()
