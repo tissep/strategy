@@ -49,7 +49,7 @@
                     BoxLayout:
                         orientation: 'vertical'
                         Label:
-                            text: str(game_board.player1_archer.get_type_of_unit())
+                            text: str(game_board.player1_archer.type_of_unit)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                         Label:
                             text: 'Health ' + str(game_board.player1_archer.health) + '/' + str(game_board.player1_archer.initial_health)
@@ -76,7 +76,7 @@
                     BoxLayout:
                         orientation: 'vertical'
                         Label:
-                            text: str(game_board.player1_knight.get_type_of_unit())
+                            text: str(game_board.player1_knight.type_of_unit)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                         Label:
                             text: 'Health ' + str(game_board.player1_knight.health) + '/' + str(game_board.player1_knight.initial_health)
@@ -104,7 +104,7 @@
                     BoxLayout:
                         orientation: 'vertical'
                         Label:
-                            text: str(game_board.player1_wizard.get_type_of_unit())
+                            text: str(game_board.player1_wizard.type_of_unit)
                             pos_hint: {'center_x': 0.5, 'center_y': 0.1}
                         Label:
                             text: 'Health ' + str(game_board.player1_wizard.health) + '/' + str(game_board.player1_wizard.initial_health)

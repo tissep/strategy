@@ -20,46 +20,43 @@ colors = {'default_background': (0, 0, 0, 0),# Black
           'units_turn': (0, 0, 66, 1),# Blue?
           'attack': (0, 33, 66, 1)}
 
-grid_type = {'Empty': '',
-             'Stone': 'S',
-             'Archer': 'A',
-             'Wizard': 'W',
-             'Knight': 'K'}
-
 max_number_of_steps = 2
-
 
 class Unit(Widget):
     health = NumericProperty(100)
 
-    def on_health(self, instance, value):
-        print('My property a changed to', value, instance)
+    short_names = {'Empty': '',
+                   'Stone': 'S',
+                   'Archer': 'A',
+                   'Wizard': 'W',
+                   'Knight': 'K'}
 
-    def __init__(self, type_of_unit="Empty", short_name="", **kwargs):
+    def __init__(self, type_of_unit="Empty", **kwargs):
         super(Unit, self).__init__(**kwargs)
         self.type_of_unit = type_of_unit
+        self.short_name = self.short_names[type_of_unit]
         self.health = 0
         self.initial_health = 0
         self.damage = 0
-        self.short_name = short_name
         self.attack_range = 0
         self.player = 0
 
     def attack(self, damage):
         self.health = self.health - damage
 
-    def get_type_of_unit(self):
-        return self.type_of_unit
+    def dead(self):
+        if self.health <= 0:
+            return True
 
 
 class Stone(Unit):
     def __init__(self, **kwargs):
-        Unit.__init__(self, "Stone", "S", **kwargs)
+        Unit.__init__(self, "Stone", **kwargs)
 
 
 class Archer(Unit):
     def __init__(self, player, **kwargs):
-        Unit.__init__(self, "Archer", "A", **kwargs)
+        Unit.__init__(self, "Archer", **kwargs)
         self.health = 100
         self.initial_health = 100
         self.damage = 10
@@ -69,7 +66,7 @@ class Archer(Unit):
 
 class Knight(Unit):
     def __init__(self, player, **kwargs):
-        Unit.__init__(self, "Knight", "K", **kwargs)
+        Unit.__init__(self, "Knight", **kwargs)
         self.health = 150
         self.initial_health = 150
         self.damage = 50
@@ -79,7 +76,7 @@ class Knight(Unit):
 
 class Wizard(Unit):
     def __init__(self, player, **kwargs):
-        Unit.__init__(self, "Wizard", "W", **kwargs)
+        Unit.__init__(self, "Wizard", **kwargs)
         self.health = 100
         self.initial_health = 100
         self.damage = 20
@@ -164,6 +161,13 @@ class GameBoardGrid(GridLayout):
 
         self.draw_board()
 
+    def clear_board(self):
+        for child in self.children:
+            child.background_color = colors['default_background']
+            child.possible_to_move_to_this_grid = False
+            child.possible_to_attack_this_grid = False
+        self.draw_board()
+
     def draw_board(self):
         for child in self.children:
             child.text = child.unit.short_name
@@ -182,11 +186,15 @@ class GameBoardGrid(GridLayout):
         row, col = button.coords
 
         if button.coords == self.active_coords:
-            self.clear_board()
             self.active_coords = [-1, -1]
-            self.draw_board()
+            self.clear_board()
         elif self.action_property == 'attack' and button.possible_to_attack_this_grid:
             button.unit.attack(self.active_unit.damage)
+            if button.unit.dead():
+                button.unit = Unit()
+                self.active_coords = [-1, -1]
+                self.player_turn = 1 if (self.player_turn == 2) else 2
+                self.clear_board()
             print("ATTACKED : " + str(button.unit.health))
         elif self.action_property == 'move' and (isinstance(button.unit, Archer) or
                                                  isinstance(button.unit, Knight) or
@@ -209,10 +217,9 @@ class GameBoardGrid(GridLayout):
                     active_unit = child.unit
                     child.unit = Unit()
             button.unit = active_unit
-            self.clear_board()
             self.active_coords = [-1, -1]
             self.player_turn = 1 if (self.player_turn == 2) else 2
-            self.draw_board()
+            self.clear_board()
 
     def show_possible_moves(self, row, col):
         move_table = [[0 for i in range(self.number_of_cols)] for j in range(self.number_of_rows)]
@@ -268,12 +275,6 @@ class GameBoardGrid(GridLayout):
 
         self.draw_board()
 
-    def clear_board(self):
-        for child in self.children:
-            child.background_color = colors['default_background']
-            child.possible_to_move_to_this_grid = False
-            child.possible_to_attack_this_grid = False
-
     def show_possible_targets(self, row, col, attack_unit):
         target_table = [[0 for i in range(self.number_of_cols)] for j in range(self.number_of_rows)]
         self.clear_board()
@@ -282,7 +283,7 @@ class GameBoardGrid(GridLayout):
         for child in self.children:
             c_row, c_col = child.coords
 
-            if child.unit.get_type_of_unit() == "Stone":
+            if child.unit.type_of_unit == "Stone":
                 target_table[c_row][c_col] = -1
             else:
                 target_table[c_row][c_col] = 99
